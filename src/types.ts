@@ -15,6 +15,7 @@ export interface Product {
   category: 'Glass' | 'Steel' | 'Plastic' | 'Other';
   stockQuantity: number;
   productImage: string;
+  productImages?: string[];
   brand: string;
   capacity: string;
   material: 'Glass' | 'Steel' | 'Plastic';

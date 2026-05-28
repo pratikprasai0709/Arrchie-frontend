@@ -21,6 +21,7 @@ export default function ProductDetails() {
   const { user } = useAuth();
   
   const [product, setProduct] = useState<Product | null>(null);
+  const [activeImage, setActiveImage] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   
@@ -36,6 +37,7 @@ export default function ProductDetails() {
       })
       .then((data) => {
         setProduct(data);
+        setActiveImage(data.productImage);
         setLoading(false);
       })
       .catch((e) => {
@@ -134,20 +136,44 @@ export default function ProductDetails() {
       {/* Main product card detail */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
         
-        {/* Large Product Image Preview Box */}
-        <div className="relative aspect-square border border-[#E8E6E1] p-4 bg-white rounded-none">
-          <img 
-            src={product.productImage} 
-            alt={product.name} 
-            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
-            referrerPolicy="no-referrer"
-          />
-          {/* Tag Overlay */}
-          <div className="absolute top-6 left-6 z-10 flex flex-col gap-1 focus:outline-hidden">
-            <span className="px-3 py-1.5 text-[9px] font-bold tracking-widest uppercase text-[#555] bg-white border border-[#E8E6E1] rounded-none">
-              {product.material} Build
-            </span>
+        {/* Large Product Image Preview Box & Gallery */}
+        <div className="space-y-4">
+          <div className="relative aspect-square border border-[#E8E6E1] p-4 bg-white rounded-none">
+            <img 
+              src={activeImage || product.productImage} 
+              alt={product.name} 
+              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+              referrerPolicy="no-referrer"
+            />
+            {/* Tag Overlay */}
+            <div className="absolute top-6 left-6 z-10 flex flex-col gap-1 focus:outline-hidden">
+              <span className="px-3 py-1.5 text-[9px] font-bold tracking-widest uppercase text-[#555] bg-white border border-[#E8E6E1] rounded-none">
+                {product.material} Build
+              </span>
+            </div>
           </div>
+          
+          {/* Multiple Images Thumbnail Gallery */}
+          {product.productImages && product.productImages.length > 1 && (
+            <div className="flex gap-2.5 overflow-x-auto pb-2">
+              {product.productImages.map((imgUrl, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveImage(imgUrl)}
+                  className={`w-20 h-20 border p-1 bg-white cursor-pointer transition-all focus:outline-hidden ${
+                    activeImage === imgUrl ? 'border-black opacity-100' : 'border-[#E8E6E1] opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={imgUrl}
+                    alt={`${product.name} gallery ${index + 1}`}
+                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+                    referrerPolicy="no-referrer"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Specifications detail text & purchase triggers */}

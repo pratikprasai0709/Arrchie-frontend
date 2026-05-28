@@ -14,7 +14,6 @@ export default function EditProduct() {
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('Glass');
   const [stockQuantity, setStockQuantity] = useState('');
-  const [productImage, setProductImage] = useState('');
   const [brand, setBrand] = useState('');
   const [capacity, setCapacity] = useState('750ml');
   const [material, setMaterial] = useState('Glass');
@@ -25,8 +24,10 @@ export default function EditProduct() {
   const [success, setSuccess] = useState(false);
 
   const [imageSource, setImageSource] = useState<'current' | 'file' | 'url'>('current');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+  const [newUrlsList, setNewUrlsList] = useState<string[]>(['']);
 
   const templates = [
     { name: 'Glass Vessel', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=600' },
@@ -36,18 +37,51 @@ export default function EditProduct() {
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    const validFiles: File[] = [];
+    
+    setErr(null);
+    for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
-        setErr('Image file size must be less than 5MB.');
-        return;
+        setErr(`Image file "${file.name}" size must be less than 5MB.`);
+        continue;
       }
-      setImageFile(file);
+      validFiles.push(file);
+      
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setNewImagePreviews(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
+    }
+    
+    setNewImageFiles(prev => [...prev, ...validFiles]);
+  };
+
+  const removeImageFile = (index: number) => {
+    setNewImageFiles(prev => prev.filter((_, i) => i !== index));
+    setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUrlChange = (index: number, val: string) => {
+    const updated = [...newUrlsList];
+    updated[index] = val;
+    setNewUrlsList(updated);
+  };
+
+  const addUrlInput = () => {
+    setNewUrlsList([...newUrlsList, '']);
+  };
+
+  const removeUrlInput = (index: number) => {
+    setNewUrlsList(newUrlsList.filter((_, i) => i !== index));
+  };
+
+  const handleTemplateSelect = (url: string) => {
+    if (newUrlsList.length === 1 && newUrlsList[0] === '') {
+      setNewUrlsList([url]);
+    } else {
+      setNewUrlsList([...newUrlsList, url]);
     }
   };
 
@@ -63,7 +97,7 @@ export default function EditProduct() {
         setPrice(String(data.price));
         setCategory(data.category);
         setStockQuantity(String(data.stockQuantity));
-        setProductImage(data.productImage);
+        setExistingImages(data.productImages && data.productImages.length > 0 ? data.productImages : [data.productImage]);
         setBrand(data.brand);
         setCapacity(data.capacity);
         setMaterial(data.material);
@@ -80,8 +114,13 @@ export default function EditProduct() {
     e.preventDefault();
     if (!token) return;
 
-    if (imageSource === 'file' && !imageFile) {
-      setErr('Please upload a product image file or select another mode.');
+    const hasExisting = existingImages.length > 0;
+    const hasNewFiles = imageSource === 'file' && newImageFiles.length > 0;
+    const filteredNewUrls = imageSource === 'url' ? newUrlsList.filter(Boolean) : [];
+    const hasNewUrls = filteredNewUrls.length > 0;
+
+    if (!hasExisting && !hasNewFiles && !hasNewUrls) {
+      setErr('A product must have at least one image.');
       return;
     }
 
@@ -99,10 +138,17 @@ export default function EditProduct() {
       formData.append('capacity', capacity);
       formData.append('material', material);
 
-      if (imageSource === 'file' && imageFile) {
-        formData.append('productImage', imageFile);
-      } else {
-        formData.append('productImage', productImage);
+      let baseImages = [...existingImages];
+      if (imageSource === 'url') {
+        baseImages = [...baseImages, ...filteredNewUrls];
+      }
+      
+      formData.append('productImages', JSON.stringify(baseImages));
+
+      if (imageSource === 'file' && newImageFiles.length > 0) {
+        newImageFiles.forEach((file) => {
+          formData.append('productImages', file);
+        });
       }
 
       const res = await fetch(`/api/products/${id}`, {
@@ -292,146 +338,163 @@ export default function EditProduct() {
                   </select>
                 </div>
 
-            <div className="space-y-3 col-span-1 md:col-span-2">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <label className="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider">
-                  Product Picture *
-                </label>
-                <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImageSource('current');
-                      setErr(null);
-                    }}
-                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
-                      imageSource === 'current'
-                        ? 'bg-amber-500 text-slate-950 font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    Keep Current
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImageSource('file');
-                      setErr(null);
-                    }}
-                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
-                      imageSource === 'file'
-                        ? 'bg-amber-500 text-slate-950 font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    Upload Laptop Image
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImageSource('url');
-                      setErr(null);
-                    }}
-                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
-                      imageSource === 'url'
-                        ? 'bg-amber-500 text-slate-950 font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    New URL
-                  </button>
-                </div>
-              </div>
+            <div className="space-y-4 col-span-1 md:col-span-2">
+              <label className="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider block">
+                Product Image Catalog
+              </label>
 
-              {imageSource === 'current' && (
-                <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-3 flex items-center gap-4">
-                  {productImage ? (
-                    <>
-                      <img
-                        src={productImage}
-                        alt="Current Product"
-                        className="w-20 h-20 object-cover rounded-lg border border-slate-850"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&q=80&w=600';
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-400">
-                          Active Catalog Image Source
-                        </p>
-                        <p className="text-[10px] text-slate-500 font-mono truncate mt-0.5">
-                          {productImage}
-                        </p>
+              {/* 1. Display Current Active Images */}
+              {existingImages.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs text-slate-400">Current Images (first is primary):</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-950/50 border border-slate-800 rounded-xl">
+                    {existingImages.map((imgUrl, idx) => (
+                      <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 flex flex-col gap-2">
+                        <img
+                          src={imgUrl}
+                          alt={`Current ${idx + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-slate-850"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&q=80&w=600';
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== idx))}
+                          className="absolute top-3 right-3 p-1 bg-rose-500/80 hover:bg-rose-600 text-white rounded-md transition-all cursor-pointer shadow-lg"
+                          title="Remove image"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
                       </div>
-                    </>
-                  ) : (
-                    <p className="text-xs text-slate-500 font-mono py-2 pl-2">No active image assigned.</p>
-                  )}
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-450 text-xs rounded-xl">
+                  ⚠️ No active images in catalog. Please upload or add at least one image below.
                 </div>
               )}
 
-              {imageSource === 'file' && (
-                <div className="space-y-3">
-                  {!imagePreview ? (
-                    <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-800 hover:border-amber-500/50 rounded-xl cursor-pointer bg-slate-950/50 hover:bg-slate-950/80 transition-all group">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="w-8 h-8 text-slate-500 group-hover:text-amber-500 transition-colors mb-2" />
+              {/* 2. Upload / Add More Images */}
+              <div className="border-t border-slate-800 pt-4 space-y-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <p className="text-xs font-semibold text-slate-400">Add More Images:</p>
+                  <div className="flex bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageSource('file');
+                        setErr(null);
+                      }}
+                      className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
+                        imageSource === 'file'
+                          ? 'bg-amber-500 text-slate-950 font-bold'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      Upload Files
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageSource('url');
+                        setErr(null);
+                      }}
+                      className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
+                        imageSource === 'url'
+                          ? 'bg-amber-500 text-slate-950 font-bold'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      New URLs
+                    </button>
+                  </div>
+                </div>
+
+                {imageSource === 'file' && (
+                  <div className="space-y-4">
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-800 hover:border-amber-500/50 rounded-xl cursor-pointer bg-slate-950/50 hover:bg-slate-950/80 transition-all group">
+                      <div className="flex flex-col items-center justify-center pt-4 pb-4">
+                        <Upload className="w-6 h-6 text-slate-500 group-hover:text-amber-500 transition-colors mb-2" />
                         <p className="text-xs font-semibold text-slate-400 group-hover:text-slate-350 transition-colors">
-                          Click to upload new product image
+                          Click to select new files to upload
                         </p>
                         <p className="text-[10px] text-slate-500 font-mono mt-1">
-                          PNG, JPG, JPEG up to 5MB
+                          PNG, JPG, JPEG up to 5MB each
                         </p>
                       </div>
                       <input
                         type="file"
+                        multiple
                         accept="image/*"
                         className="hidden"
                         onChange={handleFileChange}
                       />
                     </label>
-                  ) : (
-                    <div className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-3 flex items-center gap-4">
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-20 h-20 object-cover rounded-lg border border-slate-850"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-350 truncate">
-                          {imageFile?.name}
-                        </p>
-                        <p className="text-[10px] text-slate-500 font-mono">
-                          {imageFile && (imageFile.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setImageFile(null);
-                          setImagePreview(null);
-                        }}
-                        className="p-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-450 hover:bg-rose-500 hover:text-white rounded-lg transition-all cursor-pointer"
-                        title="Remove image"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
 
-              {imageSource === 'url' && (
-                <div className="space-y-3">
-                  <input
-                    type="url"
-                    value={productImage}
-                    onChange={(e) => setProductImage(e.target.value)}
-                    placeholder="https://images.unsplash.com/photo-..."
-                    className="w-full px-3.5 py-2.5 text-sm bg-slate-950 text-white border border-slate-800 rounded-xl focus:border-amber-500 focus:outline-hidden transition-all font-mono"
-                  />
-                  
-                  {/* Sugest templates quick picks indicators */}
+                    {newImagePreviews.length > 0 && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {newImagePreviews.map((preview, idx) => (
+                          <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 flex flex-col gap-2">
+                            <img
+                              src={preview}
+                              alt={`New Preview ${idx + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border border-slate-850"
+                            />
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-semibold text-slate-350 truncate">
+                                {newImageFiles[idx]?.name}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeImageFile(idx)}
+                              className="absolute top-3 right-3 p-1 bg-rose-500/80 hover:bg-rose-600 text-white rounded-md transition-all cursor-pointer shadow-lg"
+                              title="Remove image"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {imageSource === 'url' && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      {newUrlsList.map((url, idx) => (
+                        <div key={idx} className="flex gap-2 items-center">
+                          <input
+                            type="url"
+                            value={url}
+                            onChange={(e) => handleUrlChange(idx, e.target.value)}
+                            placeholder="https://images.unsplash.com/photo-..."
+                            className="flex-1 px-3.5 py-2 text-sm bg-slate-950 text-white border border-slate-800 rounded-xl focus:border-amber-500 focus:outline-hidden transition-all font-mono"
+                          />
+                          {newUrlsList.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeUrlInput(idx)}
+                              className="p-2.5 bg-rose-500/10 border border-rose-500/20 text-rose-450 hover:bg-rose-500 hover:text-white rounded-xl transition-all cursor-pointer"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={addUrlInput}
+                      className="px-3.5 py-2 text-xs bg-slate-950 hover:bg-slate-900 border border-slate-800 text-amber-500 font-bold rounded-xl transition-all cursor-pointer"
+                    >
+                      + Add Another Image URL
+                  </button>
+
                   <div className="pt-1 text-xs space-y-1.5">
                     <span className="text-slate-400 block font-sans">
                       💡 Catalog Suggested Templates:
@@ -441,7 +504,7 @@ export default function EditProduct() {
                         <button
                           key={tpl.name}
                           type="button"
-                          onClick={() => setProductImage(tpl.url)}
+                          onClick={() => handleTemplateSelect(tpl.url)}
                           className="px-2.5 py-1 bg-slate-850 hover:bg-slate-800 border border-slate-800 rounded-md text-[10px] font-semibold flex items-center gap-1 transition-all cursor-pointer text-slate-300 font-sans"
                         >
                           <Sparkles className="w-3 h-3 text-amber-500" />
@@ -453,6 +516,7 @@ export default function EditProduct() {
                 </div>
               )}
             </div>
+          </div>
 
                 <div className="col-span-1 md:col-span-2 pt-6">
                   <button
