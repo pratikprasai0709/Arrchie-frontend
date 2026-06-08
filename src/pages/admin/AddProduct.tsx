@@ -29,7 +29,7 @@ export default function AddProduct() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validFiles: File[] = [];
-    
+
     setErr(null);
     for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
@@ -37,14 +37,14 @@ export default function AddProduct() {
         continue;
       }
       validFiles.push(file);
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreviews(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
     }
-    
+
     setImageFiles(prev => [...prev, ...validFiles]);
   };
 
@@ -143,7 +143,7 @@ export default function AddProduct() {
 
       setSuccess(true);
       setLoading(false);
-      
+
       // Auto redirect to products dashboard after 2s
       setTimeout(() => {
         navigate('/admin/manage-products');
@@ -160,7 +160,7 @@ export default function AddProduct() {
       <AdminSidebar />
 
       <main className="flex-1 p-6 sm:p-10 space-y-10 overflow-y-auto">
-        
+
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight font-sans">
             Add Hydration Model
@@ -186,7 +186,7 @@ export default function AddProduct() {
         {/* Create Form card */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-8 max-w-4xl">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+
             <div className="space-y-1.5 col-span-1 md:col-span-2">
               <label className="text-[11px] font-bold text-slate-400 uppercase font-mono tracking-wider">
                 Model Name *
@@ -301,6 +301,7 @@ export default function AddProduct() {
                 <option value="650ml">650 ml size</option>
                 <option value="750ml">750 ml size</option>
                 <option value="1L">1.0 Liter size</option>
+                <option value="1200ml">1200 ml size</option>
               </select>
             </div>            <div className="space-y-3 col-span-1 md:col-span-2">
               <div className="flex items-center justify-between">
@@ -314,11 +315,10 @@ export default function AddProduct() {
                       setImageSource('file');
                       setErr(null);
                     }}
-                    className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
-                      imageSource === 'file'
+                    className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${imageSource === 'file'
                         ? 'bg-amber-500 text-slate-950 font-bold'
                         : 'text-slate-400 hover:text-white'
-                    }`}
+                      }`}
                   >
                     Upload File
                   </button>
@@ -328,11 +328,10 @@ export default function AddProduct() {
                       setImageSource('url');
                       setErr(null);
                     }}
-                    className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${
-                      imageSource === 'url'
+                    className={`px-3 py-1 text-[11px] font-semibold rounded-md transition-all cursor-pointer ${imageSource === 'url'
                         ? 'bg-amber-500 text-slate-950 font-bold'
                         : 'text-slate-400 hover:text-white'
-                    }`}
+                      }`}
                   >
                     Image URL
                   </button>
@@ -359,7 +358,7 @@ export default function AddProduct() {
                       onChange={handleFileChange}
                     />
                   </label>
-                  
+
                   {imagePreviews.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       {imagePreviews.map((preview, idx) => (
@@ -420,7 +419,7 @@ export default function AddProduct() {
                   >
                     + Add Another Image URL
                   </button>
-                  
+
                   {/* Sugest templates quick picks indicators */}
                   <div className="pt-1 text-xs space-y-1.5">
                     <span className="text-slate-400 block font-sans">

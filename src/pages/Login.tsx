@@ -47,7 +47,7 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto my-16 px-4 space-y-8 bg-[#FAF9F6]">
-      
+
       <div className="text-center space-y-1.5 border-b border-[#E8E6E1] pb-6">
         <span className="text-[10px] font-bold text-[#A29F98] uppercase tracking-[0.2em] block">Secure portal</span>
         <h1 className="text-3.5xl font-serif text-[#1A1A1A] italic">
@@ -66,7 +66,7 @@ export default function Login() {
 
       {/* Main Login Form */}
       <form onSubmit={handleSubmit} className="bg-white border border-[#E8E6E1] rounded-none p-8 space-y-5 shadow-none">
-        
+
         <div className="space-y-1.5">
           <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
             Email Address
@@ -117,39 +117,6 @@ export default function Login() {
         </p>
 
       </form>
-
-      {/* Sandbox Evaluation Assistance Box */}
-      <div className="p-6 bg-white border border-[#E8E6E1] rounded-none space-y-4">
-        <div className="flex items-center gap-2">
-          <Compass className="w-4 h-4 text-[#1A1A1A] shrink-0" />
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">
-            Sandbox Demonstration Seeds
-          </h4>
-        </div>
-        <p className="text-xs text-stone-500 font-light leading-relaxed">
-          Click any button below to instantly populate preconfigured buyer or administrative login credentials:
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => handleQuickCredential('admin')}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#FAF9F6] border border-[#E8E6E1] hover:bg-[#1A1A1A] hover:text-white text-[9px] font-bold uppercase tracking-widest text-stone-700 rounded-none transition-all cursor-pointer font-sans"
-          >
-            <ShieldAlert className="w-3.5 h-3.5" />
-            Admin Seed
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => handleQuickCredential('user')}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#FAF9F6] border border-[#E8E6E1] hover:bg-[#1A1A1A] hover:text-white text-[9px] font-bold uppercase tracking-widest text-stone-700 rounded-none transition-all cursor-pointer font-sans"
-          >
-            <Users className="w-3.5 h-3.5" />
-            Buyer Seed
-          </button>
-        </div>
-      </div>
-
     </div>
   );
 }
