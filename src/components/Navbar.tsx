@@ -43,6 +43,12 @@ export default function Navbar() {
               Explore Products
             </Link>
 
+            {user && user.role !== 'admin' && (
+              <Link to="/orders" className="text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A] transition-colors">
+                My Orders
+              </Link>
+            )}
+
 
             {/* Admin control panel link */}
             {user?.role === 'admin' && (
@@ -76,12 +82,12 @@ export default function Navbar() {
             {/* User Session Interface */}
             {user ? (
               <div className="flex items-center space-x-4 border-l border-[#E8E6E1] pl-6">
-                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
+                <Link to="/profile" className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1A1A1A] hover:text-black transition-colors">
                   <div className="w-8 h-8 rounded-full bg-[#E8E6E1] flex items-center justify-center text-[10px] font-bold text-[#1A1A1A]">
                     {user.name.charAt(0)}
                   </div>
                   <span className="hidden lg:inline max-w-[100px] truncate">{user.name}</span>
-                </span>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="p-2 text-[#666] hover:text-black rounded-none transition-all cursor-pointer"
@@ -96,7 +102,13 @@ export default function Navbar() {
                   to="/login"
                   className="text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A] transition-colors"
                 >
-                  Admin Login
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-all rounded-none shadow-none"
+                >
+                  Join Now
                 </Link>
               </div>
             )}
@@ -152,6 +164,15 @@ export default function Navbar() {
               >
                 Explore Products
               </Link>
+              {user && user.role !== 'admin' && (
+                <Link
+                  to="/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="block px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A]"
+                >
+                  My Orders
+                </Link>
+              )}
               {user?.role === 'admin' && (
                 <Link
                   to="/admin/dashboard"
@@ -186,13 +207,20 @@ export default function Navbar() {
                   </button>
                 </div>
               ) : (
-                <div className="border-t border-[#E8E6E1] pt-4 mt-4 flex items-center px-3">
+                <div className="border-t border-[#E8E6E1] pt-4 mt-4 flex items-center space-x-3 px-3">
                   <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="w-full text-center py-2.5 text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] border border-[#E8E6E1] rounded-none bg-white hover:bg-[#FAF9F6] transition-colors"
+                    className="flex-1 text-center py-2.5 text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] border border-[#E8E6E1] rounded-none bg-white hover:bg-[#FAF9F6] transition-colors"
                   >
-                    Admin Login
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex-1 text-center py-2.5 text-[11px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-colors rounded-none"
+                  >
+                    Register
                   </Link>
                 </div>
               )}

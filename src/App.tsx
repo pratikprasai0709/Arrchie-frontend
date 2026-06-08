@@ -43,11 +43,25 @@ function MainLayout() {
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/profile" element={<Navigate to="/" replace />} />
-          <Route path="/orders" element={<Navigate to="/" replace />} />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute userOnly>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/orders" 
+            element={
+              <ProtectedRoute userOnly>
+                <Orders />
+              </ProtectedRoute>
+            } 
+          />
 
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Navigate to="/login" replace />} />
+          <Route path="/register" element={<Register />} />
 
           {/* Secure Administrative console routing */}
           <Route 

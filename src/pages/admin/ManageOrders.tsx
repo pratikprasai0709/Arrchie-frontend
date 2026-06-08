@@ -141,15 +141,26 @@ export default function ManageOrders() {
                         <Calendar className="w-5 h-5 text-slate-400" />
                       </div>
                       <div>
-                        <h4 className="text-[10px] font-bold font-mono text-slate-505 uppercase tracking-wide">
-                          INVOICE: #{order._id}
-                        </h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-[10px] font-bold font-mono text-slate-400 uppercase tracking-wide">
+                            INVOICE: #{order._id}
+                          </h4>
+                          {order.isGuest || !order.userId ? (
+                            <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                              Guest User
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                              Registered User
+                            </span>
+                          )}
+                        </div>
                         <span className="text-xs text-slate-400 font-medium block mt-0.5">
                           {formattedDate}
                         </span>
                       </div>
                     </div>
-
+ 
                     {/* Status Select Controller */}
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold text-slate-505 font-mono">FLOW:</span>
@@ -171,24 +182,53 @@ export default function ManageOrders() {
                       </select>
                     </div>
                   </div>
-
+ 
                   {/* Customer Information detail bar */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div className="p-3.5 bg-slate-950 rounded-xl space-y-1">
                       <span className="text-[9px] font-bold font-mono text-slate-500 uppercase tracking-widest block">Recipient Details</span>
-                      <p className="font-semibold text-slate-100">{order.customerName}</p>
-                      <p className="text-slate-400 text-[11px]">{order.customerEmail}</p>
+                      <p className="font-semibold text-slate-100">
+                        {order.isGuest ? order.guestName : order.customerName}
+                      </p>
+                      <p className="text-slate-400 text-[11px]">
+                        {order.isGuest ? order.guestEmail : order.customerEmail}
+                      </p>
+                      {order.isGuest && (
+                        <p className="text-slate-500 text-[9px] font-mono">Guest Checkout</p>
+                      )}
                     </div>
-
+ 
                     <div className="p-3.5 bg-slate-950 rounded-xl space-y-1">
                       <span className="text-[9px] font-bold font-mono text-slate-500 uppercase tracking-widest block">Fulfillment Target</span>
                       <p className="font-medium text-slate-100 flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
-                        <span className="truncate">{order.shippingAddress.address}, {order.shippingAddress.city}</span>
+                        <span className="truncate">
+                          {order.isGuest ? order.guestAddress : order.shippingAddress.address}, {order.isGuest ? order.city : order.shippingAddress.city}
+                        </span>
                       </p>
-                      <p className="text-[11px] text-slate-450 font-medium pl-5">ZIP: {order.shippingAddress.zipCode} • Tel: {order.shippingAddress.phone}</p>
+                      <p className="text-[11px] text-slate-450 font-medium pl-5">
+                        {(!order.isGuest && order.shippingAddress.zipCode) ? `ZIP: ${order.shippingAddress.zipCode} • ` : ''}Tel: {order.isGuest ? order.guestPhone : order.shippingAddress.phone}
+                      </p>
                     </div>
                   </div>
+
+                  {/* Notes & Payment Details */}
+                  {(order.additionalNotes || order.paymentMethod) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs p-3.5 bg-slate-950 rounded-xl border border-slate-800/50">
+                      {order.paymentMethod && (
+                        <div>
+                          <span className="text-[9px] font-bold font-mono text-slate-500 uppercase tracking-widest block">Payment Method</span>
+                          <span className="text-slate-200 font-mono text-xs">{order.paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : order.paymentMethod}</span>
+                        </div>
+                      )}
+                      {order.additionalNotes && (
+                        <div>
+                          <span className="text-[9px] font-bold font-mono text-slate-500 uppercase tracking-widest block">Additional Notes</span>
+                          <p className="text-slate-300 font-sans italic mt-0.5">"{order.additionalNotes}"</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Items spec block */}
                   <div className="space-y-2 border-t border-slate-800/60 pt-4">

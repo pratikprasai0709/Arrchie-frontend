@@ -10,23 +10,18 @@ export default function Checkout() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
-  const [customerName, setCustomerName] = useState(user?.name || '');
-  const [customerEmail, setCustomerEmail] = useState(user?.email || '');
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [phone, setPhone] = useState('');
+  const [additionalNotes, setAdditionalNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
   
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [orderCompleted, setOrderCompleted] = useState(false);
-
-  React.useEffect(() => {
-    if (user) {
-      setCustomerName(user.name);
-      setCustomerEmail(user.email);
-    }
-  }, [user]);
 
   const subtotal = getCartTotal();
   const shipping = subtotal >= 50 ? 0 : 5.99;
@@ -36,8 +31,18 @@ export default function Checkout() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!customerName || !customerEmail || !address || !city || !zipCode || !phone) {
-      setErrorMsg('Please specify complete customer details and shipping address for your delivery.');
+    if (cartItems.length === 0) {
+      setErrorMsg('Your shopping cart is empty.');
+      return;
+    }
+
+    if (user && (!address || !city || !phone)) {
+      setErrorMsg('Please specify shipping address, city, and phone number.');
+      return;
+    }
+
+    if (!user && (!guestName || !phone || !address || !city)) {
+      setErrorMsg('Please specify your name, phone number, delivery address, and city for guest checkout.');
       return;
     }
 
@@ -61,21 +66,32 @@ export default function Checkout() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
+      const bodyPayload: Record<string, any> = {
+        items: itemsPayload,
+        totalAmount: grandTotal,
+        additionalNotes,
+        paymentMethod,
+      };
+
+      if (user) {
+        bodyPayload.shippingAddress = {
+          address,
+          city,
+          zipCode,
+          phone,
+        };
+      } else {
+        bodyPayload.guestName = guestName;
+        bodyPayload.guestPhone = phone;
+        bodyPayload.guestEmail = guestEmail;
+        bodyPayload.guestAddress = address;
+        bodyPayload.city = city;
+      }
+
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          customerName,
-          customerEmail,
-          items: itemsPayload,
-          shippingAddress: {
-            address,
-            city,
-            zipCode,
-            phone,
-          },
-          totalAmount: grandTotal,
-        }),
+        body: JSON.stringify(bodyPayload),
       });
 
       const data = await res.json();
@@ -158,112 +174,182 @@ export default function Checkout() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         
         {/* Left Side: Delivery form details */}
-        <form onSubmit={handlePlaceOrder} className="lg:col-span-7 space-y-6">
-          <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] flex items-center gap-2 border-b border-[#E8E6E1] pb-3">
-            <Truck className="w-4 h-4 text-[#1A1A1A]" />
-            Address & Contact Details
-          </h2>
-
-          {errorMsg && (
-            <div className="p-4 bg-red-50 border border-red-100 text-red-800 text-xs font-bold uppercase tracking-wider rounded-none">
-              ⚠️ {errorMsg}
+        <div className="lg:col-span-7 space-y-6">
+          {!user && (
+            <div className="p-5 bg-white border border-[#E8E6E1] space-y-3 rounded-none">
+              <span className="text-[10px] font-bold text-[#A29F98] uppercase tracking-[0.2em] block">Already have an account?</span>
+              <p className="text-xs text-stone-500 font-light leading-relaxed">
+                <Link to="/login?redirect=checkout" className="text-black font-bold underline hover:text-stone-700">
+                  Login here
+                </Link>{' '}
+                to use saved details, or continue as Guest below.
+              </p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Full Customer Name *
-              </label>
-              <input
-                type="text"
-                required
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Sarah Jenkins"
-                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
-              />
+          <form onSubmit={handlePlaceOrder} className="space-y-6">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] flex items-center gap-2 border-b border-[#E8E6E1] pb-3">
+              <Truck className="w-4 h-4 text-[#1A1A1A]" />
+              Address & Contact Details
+            </h2>
+
+            {errorMsg && (
+              <div className="p-4 bg-red-50 border border-red-100 text-red-800 text-xs font-bold uppercase tracking-wider rounded-none">
+                ⚠️ {errorMsg}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {user ? (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                      Full Customer Name (Locked)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      value={user.name}
+                      className="w-full px-3.5 py-3 text-xs bg-[#FAF9F6] text-stone-500 border border-[#E8E6E1] rounded-none cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                      Email Address (Locked)
+                    </label>
+                    <input
+                      type="email"
+                      disabled
+                      value={user.email}
+                      className="w-full px-3.5 py-3 text-xs bg-[#FAF9F6] text-stone-500 border border-[#E8E6E1] rounded-none cursor-not-allowed"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={guestName}
+                      onChange={(e) => setGuestName(e.target.value)}
+                      placeholder="Sarah Jenkins"
+                      className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                      Email Address (Optional)
+                    </label>
+                    <input
+                      type="email"
+                      value={guestEmail}
+                      onChange={(e) => setGuestEmail(e.target.value)}
+                      placeholder="sarah@example.com"
+                      className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="sm:col-span-2 space-y-1.5">
+                <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                  Delivery Address *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="123 Ocean Parkway, Apt 4B"
+                  className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                  City / Region State *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="San Francisco, CA"
+                  className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                  Postal ZIP Code {user ? '*' : '(Optional)'}
+                </label>
+                <input
+                  type="text"
+                  required={!!user}
+                  value={zipCode}
+                  onChange={(e) => setZipCode(e.target.value)}
+                  placeholder="94107"
+                  className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-1.5">
+                <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                  Active Contact Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (415) 555-0199"
+                  className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-1.5">
+                <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                  Additional Notes (Optional)
+                </label>
+                <textarea
+                  value={additionalNotes}
+                  onChange={(e) => setAdditionalNotes(e.target.value)}
+                  placeholder="Apartment gate code, leave package at door, etc."
+                  className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all leading-relaxed"
+                  rows={3}
+                />
+              </div>
+
+              <div className="sm:col-span-2 space-y-1.5">
+                <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
+                  Payment Method
+                </label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all cursor-pointer font-sans"
+                >
+                  <option value="COD">Cash on Delivery (COD)</option>
+                  <option value="Card">Credit / Debit Card</option>
+                </select>
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                required
-                value={customerEmail}
-                onChange={(e) => setCustomerEmail(e.target.value)}
-                placeholder="sarah@example.com"
-                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
-              />
-            </div>
-
-            <div className="sm:col-span-2 space-y-1.5">
-              <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Street Address *
-              </label>
-              <input
-                type="text"
-                required
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="123 Ocean Parkway, Apt 4B"
-                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                City / Region State *
-              </label>
-              <input
-                type="text"
-                required
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="San Francisco, CA"
-                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Postal ZIP Code *
-              </label>
-              <input
-                type="text"
-                required
-                value={zipCode}
-                onChange={(e) => setZipCode(e.target.value)}
-                placeholder="94107"
-                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
-              />
-            </div>
-
-            <div className="sm:col-span-2 space-y-1.5">
-              <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Active Contact Phone Number *
-              </label>
-              <input
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 (415) 555-0199"
-                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white rounded-none text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 cursor-pointer transition-all duration-300"
-          >
-            {loading ? 'Securing Inventory & Packaging...' : 'Place My Secure Hydration Order'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white rounded-none text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 cursor-pointer transition-all duration-300"
+            >
+              {loading ? 'Securing Inventory & Packaging...' : 'Place My Secure Hydration Order'}
+            </button>
+          </form>
+        </div>
 
         {/* Right Side: Recap list summary elements */}
         <div className="lg:col-span-5 space-y-6 bg-white p-8 border border-[#E8E6E1] rounded-none shadow-none">
