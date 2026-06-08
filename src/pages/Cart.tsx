@@ -23,7 +23,7 @@ export default function Cart() {
         <div className="inline-flex p-4 bg-[#FAF9F6] border border-[#E8E6E1] rounded-none text-stone-700">
           <ShoppingBag className="w-8 h-8" />
         </div>
-        
+
         <div className="space-y-2">
           <h2 className="text-xl font-serif font-bold text-gray-950 tracking-tight italic">
             Your Cart is Empty
@@ -33,7 +33,7 @@ export default function Cart() {
           </p>
         </div>
 
-        <Link 
+        <Link
           to="/products"
           className="inline-flex items-center gap-2 px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-all text-center rounded-none"
         >
@@ -46,7 +46,7 @@ export default function Cart() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 bg-[#FAF9F6]">
-      
+
       <div className="border-b border-[#E8E6E1] pb-4">
         <span className="text-[10px] font-bold text-[#A29F98] uppercase tracking-[0.2em] block mb-1">Your Basket</span>
         <h1 className="text-3.5xl font-serif text-[#1A1A1A] italic">
@@ -55,7 +55,7 @@ export default function Cart() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
+
         {/* Cart items list ledger */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => {
@@ -63,16 +63,16 @@ export default function Cart() {
             const isAtMax = item.quantity >= prod.stockQuantity;
 
             return (
-              <motion.div 
+              <motion.div
                 key={prod._id}
                 layout
                 className="flex items-center gap-5 p-5 bg-white border border-[#E8E6E1] rounded-none shadow-none"
               >
                 {/* Thumb image */}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#FAF9F6] border border-[#E8E6E1] rounded-none overflow-hidden shrink-0 p-1">
-                  <img 
-                    src={prod.productImage} 
-                    alt={prod.name} 
+                  <img
+                    src={prod.productImage}
+                    alt={prod.name}
                     className="w-full h-full object-contain grayscale"
                     referrerPolicy="no-referrer"
                   />
@@ -83,7 +83,7 @@ export default function Cart() {
                   <span className="text-[9px] font-bold text-[#A29F98] uppercase tracking-widest block">
                     {prod.brand}
                   </span>
-                  <Link 
+                  <Link
                     to={`/products/${prod._id}`}
                     className="text-xs sm:text-sm font-bold uppercase tracking-tight text-[#1A1A1A] hover:text-stone-600 transition-colors block mt-1 focus:outline-hidden"
                   >
@@ -92,7 +92,7 @@ export default function Cart() {
                   <p className="text-[10px] text-stone-500 mt-1 font-light">
                     Cap: {prod.capacity} • {prod.material}
                   </p>
-                  
+
                   {/* Warning label if inventory upper limit is touched */}
                   {isAtMax && (
                     <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-red-50 border border-red-100 rounded-none text-[9px] font-bold uppercase tracking-wide text-red-800 animate-pulse">
@@ -154,7 +154,7 @@ export default function Cart() {
                 <span>Total Items ({getCartItemCount()})</span>
                 <span className="font-bold text-[#1A1A1A] font-mono">Rs. {subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <span>Estimated Shipping</span>
                 {shipping === 0 ? (
                   <span className="text-emerald-800 font-bold uppercase text-[9px] bg-emerald-50 px-2 py-0.5 border border-emerald-100 rounded-none">
@@ -163,7 +163,7 @@ export default function Cart() {
                 ) : (
                   <span className="font-bold text-[#1A1A1A] font-mono">Rs. {shipping.toFixed(2)}</span>
                 )}
-              </div>
+              </div> */}
             </div>
 
             <div className="flex justify-between items-end pt-1">
