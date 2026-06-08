@@ -11,16 +11,10 @@ export default function Cart() {
 
   const subtotal = getCartTotal();
   const shipping = subtotal >= 50 ? 0 : subtotal === 0 ? 0 : 5.99;
-  const tax = subtotal * 0.0825; // 8.25% Sales tax
-  const grandTotal = subtotal + shipping + tax;
+  const grandTotal = subtotal + shipping;
 
   const handleCheckoutRedirect = () => {
-    if (!user) {
-      // Direct unauthorized user to Sign In page first
-      navigate('/login?redirect=checkout');
-    } else {
-      navigate('/checkout');
-    }
+    navigate('/checkout');
   };
 
   if (cartItems.length === 0) {
@@ -169,10 +163,6 @@ export default function Cart() {
                 ) : (
                   <span className="font-bold text-[#1A1A1A] font-mono">Rs. {shipping.toFixed(2)}</span>
                 )}
-              </div>
-              <div className="flex justify-between">
-                <span>Estimated Taxes (8.25%)</span>
-                <span className="font-bold text-[#1A1A1A] font-mono">Rs. {tax.toFixed(2)}</span>
               </div>
             </div>
 

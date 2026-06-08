@@ -25,8 +25,7 @@ export default function Checkout() {
 
   const subtotal = getCartTotal();
   const shipping = subtotal >= 50 ? 0 : 5.99;
-  const tax = subtotal * 0.0825;
-  const grandTotal = subtotal + shipping + tax;
+  const grandTotal = subtotal + shipping;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -384,10 +383,6 @@ export default function Checkout() {
                 ) : (
                   <span className="font-bold text-[#1A1A1A] font-mono">Rs. {shipping.toFixed(2)}</span>
                 )}
-              </div>
-              <div className="flex justify-between">
-                <span>Estimated Sales Taxes (8.25%)</span>
-                <span className="font-bold text-[#1A1A1A] font-mono">Rs. {tax.toFixed(2)}</span>
               </div>
             </div>
 
