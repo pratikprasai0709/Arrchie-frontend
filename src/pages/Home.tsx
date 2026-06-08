@@ -5,9 +5,50 @@ import ProductCard from '../components/ProductCard';
 import { ArrowRight, Flame, ShieldCheck, Zap, Scale, Gift } from 'lucide-react';
 import { motion } from 'motion/react';
 
+const bottleModelUrl = '/32oz_water_flask.glb';
+
 export default function Home() {
   const [featured, setFeatured] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const viewer = document.getElementById('bottle-3d-viewer');
+    if (viewer) {
+      const handleLoad = () => {
+
+        const model = (viewer as any).model;
+        if (model && model.materials) {
+          model.materials.forEach((material: any) => {
+            const name = material.name.toLowerCase();
+            // Target the bottle body/metallic parts
+            if (
+              name.includes('body') ||
+              name.includes('flask') ||
+              name.includes('bottle') ||
+              name.includes('metal') ||
+              name.includes('main') ||
+              name === 'default' ||
+              model.materials.length === 1
+            ) {
+              // Apply a beautiful emerald teal color factor with high metallic reflection
+              material.pbrMetallicRoughness.setBaseColorFactor([0.08, 0.48, 0.42, 1.0]);
+              material.pbrMetallicRoughness.setMetallicFactor(0.9);
+              material.pbrMetallicRoughness.setRoughnessFactor(0.15);
+            } else if (name.includes('cap') || name.includes('lid') || name.includes('top')) {
+              // Keep cap classic obsidian dark matte
+              material.pbrMetallicRoughness.setBaseColorFactor([0.15, 0.15, 0.15, 1.0]);
+              material.pbrMetallicRoughness.setMetallicFactor(0.3);
+              material.pbrMetallicRoughness.setRoughnessFactor(0.6);
+            }
+          });
+        }
+      };
+      viewer.addEventListener('load', handleLoad);
+      return () => {
+        viewer.removeEventListener('load', handleLoad);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     // Fetch products
@@ -46,12 +87,12 @@ export default function Home() {
 
   return (
     <div className="space-y-20 pb-20 bg-[#FAF9F6]">
-      
+
       {/* 1. Stunning Hero Block */}
       <section className="relative bg-white border border-[#E8E6E1] border-t-0 mx-4 sm:mx-6 lg:mx-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12">
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -60,24 +101,24 @@ export default function Home() {
             <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#A29F98] mb-6 block">
               Premium Series / 01
             </span>
-            
+
             <h1 className="text-5xl sm:text-7xl lg:text-8xl leading-[0.9] font-serif font-medium tracking-tighter mb-8 italic text-[#1A1A1A]">
-              Refined<br/>Hydration.
+              Refined<br />Hydration.
             </h1>
-            
+
             <p className="text-sm sm:text-base text-[#555] font-light leading-relaxed mb-10 max-w-xl">
               Meet AeroFlask: meticulously crafted vessels engineered with aerospace-grade vacuum performance, pure flavor extraction, and organic eco-conscious profiles designed for sustainable, modern hydration.
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link 
+              <Link
                 to="/products"
                 className="inline-flex items-center gap-2 px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-all rounded-none shadow-none"
               >
                 Explore Full Catalog
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <a 
+              <a
                 href="#categories-section"
                 className="inline-flex items-center gap-2 px-7 py-4 text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] bg-white border border-[#E8E6E1] hover:bg-[#FAF9F6] transition-all rounded-none"
               >
@@ -93,19 +134,38 @@ export default function Home() {
             className="hidden lg:col-span-5 lg:flex flex-col justify-between p-8 sm:p-12 bg-white"
           >
             <div className="aspect-[3/4] bg-[#FAF9F6] border border-[#E8E6E1] p-3 flex flex-col justify-between group overflow-hidden relative">
-              <img 
-                src="https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&q=80&w=600"
-                alt="Premium Steel Flask" 
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 max-h-[350px]"
-                referrerPolicy="no-referrer"
-              />
-              <div className="pt-4 border-t border-[#E8E6E1] flex justify-between items-end">
+
+              {/* 3D Bottle Model Viewer */}
+              <div className="w-full flex-1 flex items-center justify-center relative bg-transparent">
+                {/* @ts-expect-error - Custom web component model-viewer is supported in browser */}
+                <model-viewer
+                  id="bottle-3d-viewer"
+                  src={bottleModelUrl}
+                  alt="Arrchie 3D Premium Water Flask"
+                  camera-controls
+                  auto-rotate
+                  shadow-intensity="1.5"
+                  environment-image="neutral"
+                  exposure="1.0"
+                  touch-action="pan-y"
+                  className="w-full h-full min-h-[300px] outline-hidden bg-transparent"
+                  style={{ width: '100%', height: '100%', outline: 'none' }}
+                >
+                  <div slot="poster" className="absolute inset-0 flex items-center justify-center bg-[#FAF9F6]">
+                    <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                  {/* @ts-expect-error - Custom web component */}
+                </model-viewer>
+              </div>
+
+              <div className="pt-4 border-t border-[#E8E6E1] flex justify-between items-end bg-transparent">
                 <div>
-                  <span className="text-amber-700 text-[9px] font-bold uppercase tracking-wider block mb-0.5">BEST SELLER</span>
+                  <span className="text-stone-500 text-[9px] font-bold uppercase tracking-wider block mb-0.5">BEST SELLER</span>
                   <h3 className="text-sm font-serif font-bold text-[#1A1A1A]">Element Copper Thermo</h3>
                 </div>
                 <span className="text-[10px] font-mono font-medium text-stone-500">KEPT CHILLED 24H</span>
               </div>
+
             </div>
           </motion.div>
         </div>
@@ -164,16 +224,16 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((cat) => (
-            <Link 
+            <Link
               key={cat.name}
               to={`/products?material=${cat.name}`}
               className="group relative bg-white border border-[#E8E6E1] p-8 hover:border-[#1A1A1A] transition-all duration-500 rounded-none flex flex-col justify-between aspect-video md:aspect-[4/3] cursor-pointer"
             >
               {/* Background illustrative bottle snippet */}
               <div className="absolute right-0 bottom-0 w-32 h-32 opacity-25 group-hover:opacity-40 rounded-none overflow-hidden transition-all duration-500 bg-[#FAF9F6] border-t border-l border-[#E8E6E1] p-1.5">
-                <img 
-                  src={cat.image} 
-                  alt={cat.name} 
+                <img
+                  src={cat.image}
+                  alt={cat.name}
                   className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-transform duration-700"
                   referrerPolicy="no-referrer"
                 />
@@ -203,7 +263,7 @@ export default function Home() {
             <span className="text-[10px] font-bold text-[#A29F98] uppercase tracking-[0.2em]">Top Rated Hydration</span>
             <h2 className="text-2xl font-serif text-[#1A1A1A] mt-1 italic">Featured Bottle Models</h2>
           </div>
-          <Link 
+          <Link
             to="/products"
             className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] hover:text-stone-600 transition-colors"
           >
@@ -245,7 +305,7 @@ export default function Home() {
               Provide corporate identification or fitness clubs alignment models. We offer tailored precision-machined logo laser engraving for volume orders of 25+ flasks.
             </p>
           </div>
-          <Link 
+          <Link
             to="/products"
             className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-all text-center shrink-0 rounded-none border border-transparent"
           >

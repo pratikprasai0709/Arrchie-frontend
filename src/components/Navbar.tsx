@@ -21,7 +21,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-white border-b border-[#E8E6E1] shadow-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          
+
           {/* Brand Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-3 group">
@@ -29,7 +29,7 @@ export default function Navbar() {
                 <ShoppingBag className="w-4 h-4 text-[#1A1A1A]" />
               </div>
               <span className="font-serif font-black text-2xl tracking-tighter text-[#1A1A1A]">
-                AERO<span className="text-[#A29F98]">.FLASK</span>
+                ARRCHIE<span className="text-[#A29F98]">.com</span>
               </span>
             </Link>
           </div>
@@ -42,7 +42,7 @@ export default function Navbar() {
             <Link to="/products" className="text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A] transition-colors">
               Explore Products
             </Link>
-            
+
             {user && (
               <Link to="/orders" className="text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A] transition-colors">
                 My Orders
@@ -51,8 +51,8 @@ export default function Navbar() {
 
             {/* Admin control panel link */}
             {user?.role === 'admin' && (
-              <Link 
-                to="/admin/dashboard" 
+              <Link
+                to="/admin/dashboard"
                 className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#1A1A1A] bg-white border border-[#E8E6E1] hover:bg-[#FAF9F6] transition-all rounded-none"
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
@@ -65,8 +65,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-6">
             {/* Cart Button */}
             {user?.role !== 'admin' && (
-              <Link 
-                to="/cart" 
+              <Link
+                to="/cart"
                 className="relative p-2 text-[#666] hover:text-[#1A1A1A] hover:bg-[#FAF9F6] transition-all rounded-none"
               >
                 <ShoppingCart className="w-4 h-4" />
@@ -97,14 +97,14 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-4 border-l border-[#E8E6E1] pl-6">
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A] transition-colors"
                 >
                   Sign In
                 </Link>
-                <Link 
-                  to="/register" 
+                <Link
+                  to="/register"
                   className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-all rounded-none shadow-none"
                 >
                   Join Now
@@ -116,8 +116,8 @@ export default function Navbar() {
           {/* Mobile Hamburguer Toggle */}
           <div className="flex items-center md:hidden">
             {user?.role !== 'admin' && (
-              <Link 
-                to="/cart" 
+              <Link
+                to="/cart"
                 className="relative p-2 mr-2 text-[#666] hover:text-black transition-all"
               >
                 <ShoppingCart className="w-4 h-4" />
@@ -142,21 +142,21 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden border-b border-[#E8E6E1] bg-white"
           >
             <div className="px-3 pt-2 pb-5 space-y-1 sm:px-4">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 onClick={() => setMobileOpen(false)}
                 className="block px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A]"
               >
                 Collection
               </Link>
-              <Link 
+              <Link
                 to="/products"
                 onClick={() => setMobileOpen(false)}
                 className="block px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A]"
@@ -164,7 +164,7 @@ export default function Navbar() {
                 Explore Products
               </Link>
               {user && (
-                <Link 
+                <Link
                   to="/orders"
                   onClick={() => setMobileOpen(false)}
                   className="block px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-[#666] hover:text-[#1A1A1A]"
@@ -173,7 +173,7 @@ export default function Navbar() {
                 </Link>
               )}
               {user?.role === 'admin' && (
-                <Link 
+                <Link
                   to="/admin/dashboard"
                   onClick={() => setMobileOpen(false)}
                   className="block px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-[#1A1A1A] bg-[#FAF9F6] border border-[#E8E6E1] rounded-none"
@@ -185,7 +185,7 @@ export default function Navbar() {
               {user ? (
                 <div className="border-t border-[#E8E6E1] pt-3 mt-3">
                   <div className="px-3 py-2 flex items-center justify-between">
-                    <Link 
+                    <Link
                       to="/profile"
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1A1A1A]"
@@ -207,14 +207,14 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="border-t border-[#E8E6E1] pt-4 mt-4 flex items-center space-x-3 px-3">
-                  <Link 
+                  <Link
                     to="/login"
                     onClick={() => setMobileOpen(false)}
                     className="flex-1 text-center py-2.5 text-[11px] font-bold uppercase tracking-widest text-[#1A1A1A] border border-[#E8E6E1] rounded-none bg-white hover:bg-[#FAF9F6] transition-colors"
                   >
                     Sign In
                   </Link>
-                  <Link 
+                  <Link
                     to="/register"
                     onClick={() => setMobileOpen(false)}
                     className="flex-1 text-center py-2.5 text-[11px] font-bold uppercase tracking-widest text-white bg-[#1A1A1A] hover:bg-black transition-colors rounded-none"
