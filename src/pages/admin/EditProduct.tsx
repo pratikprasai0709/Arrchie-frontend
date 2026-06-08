@@ -353,7 +353,7 @@ export default function EditProduct() {
                         <img
                           src={imgUrl}
                           alt={`Current ${idx + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border border-slate-850"
+                          className="w-full h-24 object-contain rounded-lg border border-slate-850"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&q=80&w=600';
                           }}
@@ -440,7 +440,7 @@ export default function EditProduct() {
                             <img
                               src={preview}
                               alt={`New Preview ${idx + 1}`}
-                              className="w-full h-24 object-cover rounded-lg border border-slate-850"
+                              className="w-full h-24 object-contain rounded-lg border border-slate-850"
                             />
                             <div className="min-w-0">
                               <p className="text-[10px] font-semibold text-slate-350 truncate">

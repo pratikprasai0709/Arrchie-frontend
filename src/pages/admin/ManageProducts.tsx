@@ -137,7 +137,7 @@ export default function ManageProducts() {
                         {/* Image + Title */}
                         <td className="p-4 flex items-center gap-3">
                           <div className="w-10 h-10 border border-slate-800 rounded overflow-hidden shrink-0 bg-slate-950">
-                            <img src={prod.productImage} alt={prod.name} className="w-full h-full object-cover" />
+                            <img src={prod.productImage} alt={prod.name} className="w-full h-full object-contain" />
                           </div>
                           <div>
                             <span className="font-mono text-[9px] text-slate-500 uppercase tracking-wider">{prod.brand}</span>

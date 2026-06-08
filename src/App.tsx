@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
@@ -38,45 +38,16 @@ function MainLayout() {
       <div className={isAdminRoute ? "flex-1 flex flex-col" : "flex-1 max-w-7xl w-full mx-auto px-0 sm:px-4"}>
         <Routes>
           {/* User storefront routes */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Products />} />
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetails />} />
-          <Route 
-            path="/cart" 
-            element={
-              <ProtectedRoute userOnly>
-                <Cart />
-              </ProtectedRoute>
-            } 
-          />
-          
-          <Route 
-            path="/checkout" 
-            element={
-              <ProtectedRoute userOnly>
-                <Checkout />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/profile" 
-            element={
-              <ProtectedRoute userOnly>
-                <Profile />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/orders" 
-            element={
-              <ProtectedRoute userOnly>
-                <Orders />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/profile" element={<Navigate to="/" replace />} />
+          <Route path="/orders" element={<Navigate to="/" replace />} />
 
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Navigate to="/login" replace />} />
 
           {/* Secure Administrative console routing */}
           <Route 

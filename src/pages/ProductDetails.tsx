@@ -3,11 +3,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { 
-  ArrowLeft, 
-  ShoppingCart, 
-  Sparkles, 
-  ShieldAlert, 
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Sparkles,
+  ShieldAlert,
   Plus,
   Minus,
   Check
@@ -19,12 +19,12 @@ export default function ProductDetails() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { user } = useAuth();
-  
+
   const [product, setProduct] = useState<Product | null>(null);
   const [activeImage, setActiveImage] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  
+
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [toastErr, setToastErr] = useState<string | null>(null);
 
@@ -91,11 +91,11 @@ export default function ProductDetails() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10 bg-[#FAF9F6]">
-      
+
       {/* Dynamic Toast Alert Header */}
       <AnimatePresence>
         {toastMsg && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -108,7 +108,7 @@ export default function ProductDetails() {
           </motion.div>
         )}
         {toastErr && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -124,7 +124,7 @@ export default function ProductDetails() {
 
       {/* Back breadcrumb */}
       <div>
-        <Link 
+        <Link
           to="/products"
           className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-stone-500 hover:text-black transition-colors"
         >
@@ -135,14 +135,14 @@ export default function ProductDetails() {
 
       {/* Main product card detail */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-        
+
         {/* Large Product Image Preview Box & Gallery */}
         <div className="space-y-4">
           <div className="relative aspect-square border border-[#E8E6E1] p-4 bg-white rounded-none">
-            <img 
-              src={activeImage || product.productImage} 
-              alt={product.name} 
-              className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+            <img
+              src={activeImage || product.productImage}
+              alt={product.name}
+              className="w-full h-full object-contain transition-all duration-700"
               referrerPolicy="no-referrer"
             />
             {/* Tag Overlay */}
@@ -152,7 +152,7 @@ export default function ProductDetails() {
               </span>
             </div>
           </div>
-          
+
           {/* Multiple Images Thumbnail Gallery */}
           {product.productImages && product.productImages.length > 1 && (
             <div className="flex gap-2.5 overflow-x-auto pb-2">
@@ -160,14 +160,13 @@ export default function ProductDetails() {
                 <button
                   key={index}
                   onClick={() => setActiveImage(imgUrl)}
-                  className={`w-20 h-20 border p-1 bg-white cursor-pointer transition-all focus:outline-hidden ${
-                    activeImage === imgUrl ? 'border-black opacity-100' : 'border-[#E8E6E1] opacity-60 hover:opacity-100'
-                  }`}
+                  className={`w-20 h-20 border p-1 bg-white cursor-pointer transition-all focus:outline-hidden ${activeImage === imgUrl ? 'border-black opacity-100' : 'border-[#E8E6E1] opacity-60 hover:opacity-100'
+                    }`}
                 >
                   <img
                     src={imgUrl}
                     alt={`${product.name} gallery ${index + 1}`}
-                    className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
+                    className="w-full h-full object-contain transition-all"
                     referrerPolicy="no-referrer"
                   />
                 </button>
@@ -185,13 +184,13 @@ export default function ProductDetails() {
             <h1 className="text-3xl sm:text-4xl font-serif font-medium tracking-tight text-[#1A1A1A] italic leading-tight">
               {product.name}
             </h1>
-            
+
             {/* Stock Badges */}
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="px-2.5 py-1 text-[9px] font-mono rounded-none bg-white border border-[#E8E6E1] text-[#666]">
                 Cap: {product.capacity}
               </span>
-              
+
               {isOutOfStock ? (
                 <span className="px-2.5 py-1 text-[9px] font-bold tracking-wider uppercase text-white bg-red-650 rounded-none">
                   Sold Out
@@ -255,7 +254,7 @@ export default function ProductDetails() {
               <span className="text-[9px] font-bold text-[#A29F98] uppercase tracking-widest block">
                 Select Purchase Quantity
               </span>
-              
+
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 {/* Quantity Toggle counter */}
                 <div className="flex items-center border border-[#E8E6E1] rounded-none bg-white p-2">

@@ -79,7 +79,7 @@ export default function Cart() {
                   <img 
                     src={prod.productImage} 
                     alt={prod.name} 
-                    className="w-full h-full object-cover grayscale"
+                    className="w-full h-full object-contain grayscale"
                     referrerPolicy="no-referrer"
                   />
                 </div>

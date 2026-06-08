@@ -196,7 +196,7 @@ export default function ManageOrders() {
                     {order.items.map((it: any) => (
                       <div key={it.productId} className="flex gap-3 py-1 items-center bg-slate-950/30 px-3 py-2 rounded-lg text-xs leading-normal">
                         <div className="w-8 h-8 rounded border border-slate-800 overflow-hidden shrink-0 bg-slate-950">
-                          <img src={it.productImage} alt={it.name} className="w-full h-full object-cover" />
+                          <img src={it.productImage} alt={it.name} className="w-full h-full object-contain" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h5 className="font-semibold text-slate-205 truncate">{it.name}</h5>

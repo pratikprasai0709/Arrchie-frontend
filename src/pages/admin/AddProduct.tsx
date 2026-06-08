@@ -367,7 +367,7 @@ export default function AddProduct() {
                           <img
                             src={preview}
                             alt={`Preview ${idx + 1}`}
-                            className="w-full h-24 object-cover rounded-lg border border-slate-850"
+                            className="w-full h-24 object-contain rounded-lg border border-slate-850"
                           />
                           <div className="min-w-0">
                             <p className="text-[10px] font-semibold text-slate-350 truncate">

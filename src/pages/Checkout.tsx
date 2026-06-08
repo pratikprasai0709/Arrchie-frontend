@@ -10,6 +10,8 @@ export default function Checkout() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
 
+  const [customerName, setCustomerName] = useState(user?.name || '');
+  const [customerEmail, setCustomerEmail] = useState(user?.email || '');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
@@ -19,6 +21,13 @@ export default function Checkout() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [orderCompleted, setOrderCompleted] = useState(false);
 
+  React.useEffect(() => {
+    if (user) {
+      setCustomerName(user.name);
+      setCustomerEmail(user.email);
+    }
+  }, [user]);
+
   const subtotal = getCartTotal();
   const shipping = subtotal >= 50 ? 0 : 5.99;
   const tax = subtotal * 0.0825;
@@ -26,10 +35,9 @@ export default function Checkout() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
 
-    if (!address || !city || !zipCode || !phone) {
-      setErrorMsg('Please specify complete shipping details for your delivery.');
+    if (!customerName || !customerEmail || !address || !city || !zipCode || !phone) {
+      setErrorMsg('Please specify complete customer details and shipping address for your delivery.');
       return;
     }
 
@@ -46,13 +54,19 @@ export default function Checkout() {
     }));
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({
+          customerName,
+          customerEmail,
           items: itemsPayload,
           shippingAddress: {
             address,
@@ -100,14 +114,8 @@ export default function Checkout() {
 
         <div className="flex flex-col gap-3 pt-2">
           <Link 
-            to="/orders"
-            className="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white text-[10px] font-bold uppercase tracking-widest text-center rounded-none"
-          >
-            Track in My Orders
-          </Link>
-          <Link 
             to="/"
-            className="w-full py-4 bg-white border border-[#E8E6E1] hover:bg-[#FAF9F6] text-stone-700 text-[10px] font-bold uppercase tracking-widest text-center rounded-none transition-colors"
+            className="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white text-[10px] font-bold uppercase tracking-widest text-center rounded-none transition-colors"
           >
             Return to Storefront
           </Link>
@@ -165,25 +173,29 @@ export default function Checkout() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div className="space-y-1.5">
               <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Full Customer Name (Locked)
+                Full Customer Name *
               </label>
               <input
                 type="text"
-                disabled
-                value={user?.name || ''}
-                className="w-full px-3.5 py-3 text-xs bg-[#FAF9F6] text-stone-500 border border-[#E8E6E1] rounded-none cursor-not-allowed"
+                required
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Sarah Jenkins"
+                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-[9px] font-bold text-[#A29F98] uppercase tracking-wider block">
-                Email Address (Locked)
+                Email Address *
               </label>
               <input
-                type="text"
-                disabled
-                value={user?.email || ''}
-                className="w-full px-3.5 py-3 text-xs bg-[#FAF9F6] text-stone-500 border border-[#E8E6E1] rounded-none cursor-not-allowed"
+                type="email"
+                required
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                placeholder="sarah@example.com"
+                className="w-full px-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
               />
             </div>
 
@@ -262,7 +274,7 @@ export default function Checkout() {
               {cartItems.map((ci) => (
                 <div key={ci.product._id} className="flex gap-4 py-3.5 items-center">
                   <div className="w-12 h-12 border border-[#E8E6E1] bg-[#FAF9F6] rounded-none p-1 overflow-hidden shrink-0">
-                    <img src={ci.product.productImage} alt={ci.product.name} className="w-full h-full object-cover grayscale" />
+                    <img src={ci.product.productImage} alt={ci.product.name} className="w-full h-full object-contain grayscale" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-bold uppercase tracking-tight text-[#1A1A1A] truncate">{ci.product.name}</h4>

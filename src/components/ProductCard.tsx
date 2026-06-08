@@ -15,7 +15,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to detail page when knocking button click
     const res = addToCart(product, 1);
-    
+
     if (res.success) {
       setSuccessMsg(`Added 1x ${product.name}!`);
       setTimeout(() => setSuccessMsg(null), 2500);
@@ -29,7 +29,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const isLowStock = product.stockQuantity > 0 && product.stockQuantity <= 5;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className="relative flex flex-col bg-white border border-[#E8E6E1] rounded-none hover:border-[#1A1A1A] transition-all duration-300 group"
@@ -62,7 +62,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <img
           src={product.productImage}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
           referrerPolicy="no-referrer"
         />
         {/* Subtle hover overlay */}
@@ -78,8 +78,8 @@ export default function ProductCard({ product }: { product: Product }) {
         <span className="text-[9px] font-bold tracking-[0.25em] text-[#A29F98] uppercase mb-1.5 inline-block">
           {product.brand}
         </span>
-        <Link 
-          to={`/products/${product._id}`} 
+        <Link
+          to={`/products/${product._id}`}
           className="text-sm font-bold uppercase tracking-tight text-[#1A1A1A] group-hover:text-stone-600 transition-colors mb-1.5 focus:outline-hidden"
         >
           {product.name}
@@ -93,7 +93,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="text-base font-serif font-bold text-[#1A1A1A]">
             Rs. {product.price.toFixed(2)}
           </span>
-          
+
           {isOutOfStock ? (
             <button
               disabled
@@ -120,7 +120,7 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Popup Notifications */}
       <AnimatePresence>
         {successMsg && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
@@ -130,7 +130,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </motion.div>
         )}
         {errorMsg && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}

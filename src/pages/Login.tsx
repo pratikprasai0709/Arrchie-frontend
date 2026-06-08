@@ -49,12 +49,12 @@ export default function Login() {
     <div className="max-w-md mx-auto my-16 px-4 space-y-8 bg-[#FAF9F6]">
       
       <div className="text-center space-y-1.5 border-b border-[#E8E6E1] pb-6">
-        <span className="text-[10px] font-bold text-[#A29F98] uppercase tracking-[0.2em] block">Secure portal</span>
+        <span className="text-[10px] font-bold text-[#A29F98] uppercase tracking-[0.2em] block">Admin Portal</span>
         <h1 className="text-3.5xl font-serif text-[#1A1A1A] italic">
-          Welcome Back
+          Admin Log In
         </h1>
         <p className="text-xs text-stone-500 font-light font-sans max-w-xs mx-auto">
-          Log in to track orders, manage profiles, and save shopping carts.
+          Log in to access the administrative console to manage products, inventory, and orders.
         </p>
       </div>
 
@@ -77,7 +77,7 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="user@bottle.com"
+              placeholder="admin@bottle.com"
               className="w-full pl-9 pr-3.5 py-3 text-xs bg-white border border-[#E8E6E1] rounded-none focus:outline-none focus:border-black transition-all"
             />
             <Mail className="absolute left-3 top-3.5 w-3.5 h-3.5 text-stone-400" />
@@ -109,12 +109,7 @@ export default function Login() {
           {signing ? 'Verifying Credentials...' : 'Sign In To AeroFlask'}
         </button>
 
-        <p className="text-xs text-center text-stone-500 font-light">
-          First-time customer?{' '}
-          <Link to="/register" className="text-[#1A1A1A] font-bold underline hover:text-stone-600">
-            Create an Account
-          </Link>
-        </p>
+
 
       </form>
 
@@ -127,9 +122,9 @@ export default function Login() {
           </h4>
         </div>
         <p className="text-xs text-stone-500 font-light leading-relaxed">
-          Click any button below to instantly populate preconfigured buyer or administrative login credentials:
+          Click the button below to instantly populate preconfigured administrative login credentials:
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <button
             type="button"
             onClick={() => handleQuickCredential('admin')}
@@ -137,15 +132,6 @@ export default function Login() {
           >
             <ShieldAlert className="w-3.5 h-3.5" />
             Admin Seed
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => handleQuickCredential('user')}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#FAF9F6] border border-[#E8E6E1] hover:bg-[#1A1A1A] hover:text-white text-[9px] font-bold uppercase tracking-widest text-stone-700 rounded-none transition-all cursor-pointer font-sans"
-          >
-            <Users className="w-3.5 h-3.5" />
-            Buyer Seed
           </button>
         </div>
       </div>

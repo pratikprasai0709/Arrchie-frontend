@@ -126,7 +126,7 @@ export default function Orders() {
                 {order.items.map((item, idx) => (
                   <div key={item.productId} className={`flex items-center gap-4 ${idx > 0 ? 'pt-4' : ''}`}>
                     <div className="w-12 h-12 bg-[#FAF9F6] rounded-none border border-[#E8E6E1] p-1 overflow-hidden shrink-0">
-                      <img src={item.productImage} alt={item.name} className="w-full h-full object-cover grayscale" />
+                      <img src={item.productImage} alt={item.name} className="w-full h-full object-contain grayscale" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-bold uppercase tracking-tight text-[#1A1A1A] truncate pr-4">{item.name}</h4>
